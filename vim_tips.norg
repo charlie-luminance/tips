@@ -1,0 +1,1253 @@
+## 1: Registers and Macros
+
+  Registers are storage spaces for holding text. The a-z registers are for you to do with as you please while other registers are automatically filled by Vim.
+
+  To record a macro into the `x` register (would work for any other a-z register), from normal mode enter `qx` to start recording your macro, then do whatever you want to record, and finally `q` to stop recording. `@x` will replay the macro.
+
+  This simply fills the `x` register with all your key presses during recording. You can see the contents of registers with `:registers`. You can also paste the contents of the `x` register with `"xp` this is useful for editing a macro without having to rerecord it. Edit the text and then yank back into the `x` register with `"xyy`. Many commands can be prepended with `"x` to act on the `x` register. 
+
+## 2: Replaying Macros
+
+  The `@` register holds the value of the most recently played macro. This has two main uses:
+
+  1. You can replay a macro with `@@`. This is most useful when you don't know how many times you need to execute a macro. Say your macro operates on blocks of text and there are 7 such blocks. In the time it takes to count the 7 blocks in order to execute "7@<reg>" you could have done `@<reg>` then `@@` to the end.
+
+  2. It can occasionally save you if you accidentally override your macro. 
+
+## 3: Repeating commands
+
+  The `:` register holds the value of the most recent Ex-command (command executed by pressing `:`, typing and pressing enter). You can use `@:` to replay the most recent Ex-command.
+
+## 4: Appending to registers
+
+  You can put whatever you want into registers `a-z`. By addressing them as capitals (`A-Z`) we can append to the register rather than overriding it. This is most useful when you want to yank a bunch of non-contiguous lines as a single block of text. For example, say you have the following 
+
+  1
+  2
+  a
+  3
+  5
+  4
+
+  and you want to copy the number lines in the right order (and omitting the `a`). You could do this by editing the text but this would be messy and would need to be undone afterwards. Instead `"ayy` the `1` line, then `"Ayy` on the 2, 3, 4 and 5 lines.
+
+  If this was a much larger piece of text then having to do `"Ayy` each time can be awkward. We can combine appending to a register with the previous tips to make this easier. 
+  - `"ayy` on the first line you want
+  - `:norm "Ayy` on the second line you want. This is the same as `"Ayy` but done as an Ex-command.
+  - `@:` on the third line you want. This will repeat the `:norm "Ayy` we just did.
+  - `@@` on all future lines.
+    This is more awkward for the first 3 lines but much easier for the rest.
+
+## 5: Numbered registers
+
+  Register `0` contains the last yanked text (this differs from the default `"` register which contains the last yanked, deleted or changed text). Registers `1`-`9` contain previously deleted text with `1` containing the most recently deleted text. If the text you delete is less than one line (e.g. diw), the `1`-`9` registers are not used and the small delete register is used instead (`-`).
+
+## 6: Registers on the command line
+
+  If you are on the command line (for example entering an Ex command or a search) you can enter the contents of a register with `<C-R>` followed by the register. For example, to search for the text we have most recently yanked, we can do `/<C-R>"` as the `"` register is the default register and will contain the most recently yanked, deleted or changed text.
+
+  You can also use <C-R> on the command line to insert the item under the cursor.
+  - <C-R><C-W> Insert word under cursor
+  - <C-R><C-A> Insert WORD under cursor
+  - <C-R><C-F> Insert filename under cursor
+  - <C-R><C-P> Insert filename (expanded) under cursor
+  - <C-R><C-L> Insert line under cursor
+
+## 7 Expression register
+
+  `=` is the expression register. This is a special register that allows you to use and expression where you would use a register. For example `"=2+2<CR>p` will paste `4`
+
+## 8: The rest of the registers
+
+  `"`: The default register. For example `yy` yanks into here.
+  `.`: Contains the last inserted text.
+  `%`: Contains the name of the current file.
+  `#`: Contains the name of the alternate file (basically the previous file you were editing).
+  `=`: Magic register which allows you to use a expression where you would use a register.
+  `+`: Synced with clipboard.
+  `*`: Synced with selection clipboard (on unix there is a second clipboard with the currently highlighted text).
+  `_`: Black hole, write to this to not affect other registers.
+  `/`: Contains the last search pattern.
+
+## 9: Marks
+
+  Marks are specific locations in a document that you can jump to. Like registers there are some which are for you to set and some which are automatically filled.
+
+  To set a mark, use `m<mark>` e.g. `ma` sets the `a` mark.
+  To jump to a mark use `'<mark>` or `\`<mark>`. The former will jump to the start of the marked line while the latter will jump to the specific column of the mark as well.
+
+  Use `:marks` to see your marks
+
+## 10: More marks
+
+  The `a-z` marks are file specific while the `A-Z` marks are global (allow you to jump between files).
+
+  Some of the most useful other marks are:
+  - `0-9`: `0` jumps to position in last file edited. `1` to the position in the second last file edited...
+  - `'`: Position you have jumped from (`<C-O>` is probably better for jumping)
+  - `.`: Most recent change (although you might prefer `g; for jumping`)
+  - `"`: The cursor position when most recently exiting the buffer.
+
+  It's also worth knowing that `<` and `>` are the ends of the most recent visual selection. This is why pressing `:` in visual modes adds `'<,'>` to the command; this means the lines between and including the start and end of the most recent visual selection.
+
+## 11: Buffers
+
+  A buffer is an in-memory representation of a file.
+
+  You can open another file with `:e <file>` or use the file explorer with `:e .`. `:e` reloads the current buffer .
+
+  See your open buffers with `:ls`.
+
+  Go to next and previous buffers with `:bn` and `:bp`.
+
+  Close a buffer with `:bd`.
+
+## 12: Windows
+
+  A window is a view into a buffer.
+
+  You can split the screen into multiple windows to view more than one buffer at once. A key way in which this differs from IDEs like VSCode is that there is still a single list of buffers that both windows share.
+
+  Split a window with `<C-W>s` or split vertically with `<C-W>v`. A split window can be split again to allow 3 or more buffers to be viewed at once.
+
+  To move the cursor between windows, use `<C-W>` followed by the usual `hjkl`.
+
+  Close a window with the usual `:q`. Close all window (and exit vim) with `:qa`.
+
+## 13: More windows
+
+  `<C-W>` followed by `HJKL` will move the window in that direction.
+
+  `<C-W>` followed by `-+<>` will make the current window shorter, taller, narrower and wider respectively.
+  `<C-W> =` will try to make all windows the same size.
+
+## 14: Tab pages
+
+  A tab page is just an arrangement of windows.
+
+  Having multiple tab pages can be useful when you want multiple views: e.g. one tab page that is a single window containing code and a second tab page that contains multiple windows with different information in them that you need to refer to.
+
+  Create a new tab page with `:tabe`. Close the current tab page with `:tabc`. Go to the next/previous tab page with `gt` and `gT` respectively.
+
+## 15: Jumplist
+
+  Motions that move several lines are jumps. You can see your history of jumps with `:jumps`.
+
+  Navigate your jump list with `CTRL-O` (out) to go back and `CTRL-I` (in) to go forwards. For example, if you need to add an import at the top of the file, `gg` to jump to the top, add your import and `CTRL-O` to go back to wherever you were before.
+
+## 16: Changelist
+
+  The position of changes you make are added to the change list. You can see the change list with `:changes`.
+
+  Use `g;` to go backwards through the change list and `g,` to go forwards. Simply using `g;` to go back to your last change is very useful.
+
+## 17: Undolist 
+
+  You can use `u` to undo a change and `CTRL-R` to redo.
+
+  However, using these commands can create branches in your undo history that you cannot get to from those commands alone. For example if you add the text "Foo", undo that addition and then add the text "Bar": there is no way to get back "Foo" with `u` and `CTRL-R` alone.
+
+  The undo list can be viewed with `:undolist`. This lists all the leaves in the undo tree.
+
+  You can use `g-` and `g+` to go to older and newer text state. These differ from `u` and`CTRL-R` since they explore all the branches. There is a good example of this in the docs just below `:h g+`.
+
+  Being able go down other branches in you undo history is rarely useful but, when it is, it can save needing to redo a lot of work.
+
+## 18: Quickfix/location lists
+
+  The quickfix and location lists are similar to the problems panel in IDEs like VSCode. They appear as a small window at the bottom of the screen which contains references to lines. After switching to the list with `CTRL-W j`, you can press `Enter` to jump to any of the referenced lines.
+
+  Vim has two built in commands which populate these lists: `:grep` and `:make`. By default, these will run `grepp` and `make` but can be configured to run a different grep or build command (for example, I used `ripgrep` instead of `grep`).
+
+  The difference between the quickfix and location lists is that the quickfix list is global and can reference lines in any file while the location list is specific to a buffer.
+
+  The `:lgrep` and `:lmake` variants of the commands use the location list rather than the quickfix list.
+
+  An annoying detail is that commands that utilise the quickfix list start with `c` rather than `q` as you would expect. For example `:cdo cmd` executes the command on all lines in the quickfix list (particularly useful for renaming something across all files after `:grep`ing for it). The location list variants start with `l` as you would expect.
+
+  Plugins that provide linting will usually make use of these lists to highlight linting issues.
+
+## 19: Command-line window
+
+  The command-line window allows you to edit commands (and your history of commands) like a normal buffer.
+
+  You can open the command-line window with `q:` for Ex-commands, or `q/`/`q?` for searches. You have almost certainly accidentally opened this window when you tried to do `:q` to quit and pressed the keys in the wrong order.
+  You can also open the command-line window with `CTRL-F` after `:`, `/` or `?`.
+
+  The command-line window is special in a few ways. While open, you cannot move to any other window.
+  You can leave the window in a few ways:
+  1. Pressing `Enter` from normal mode will execute the command/search line under the cursor.
+  2. Pressing `CTRL-C` will close the command line window and continue in command-line mode.
+  3. `:q` and other similar commands like usual.
+
+## 20: * and # 
+
+  `*` will search forwards for the word under the cursor. `#` will search backwards. These searches will only match where there is a word boundary on each side (so "cake" won't match "pancake").
+
+  My favourite use of this is for changing a variable name. Put the cursor on the variable and `*` to search for it. Now do `ciwFoo<ESC>` to replace the variable name. Now use `n` to go to the next instance of the variable and `.` to repeat the replace. You could use `:s` but this is much easier and more interactive.
+
+## 21: Options
+
+  Vim has a lot of options for changing it's behaviour. You can see a quick explanation of them all with `:h option-list`
+
+  You can set an option with `:set <option>=<value>`. Check the current value of an option with `:set <option>?`.
+  You can also put options into `~/.vimrc` so they are always set.
+
+  Options are either boolean, numeric or strings.
+
+## 22: Tab/spaces options
+
+  These options are quite confusing but important to get right.
+
+  - `tabstop` (numeric): How big a tab character appears on the screen. Default is 8.
+  - `expandtab` (bool): If true the tab key actually inserts spaces rather than tabs. Default is False.
+  - `softtabstop` (numeric): This is a weird option, probably best to just read `:h softtabstop` for the full explanation. You can basically think of this as being the number of spaces inserted with tab and removed with backspace when `expandtab` is true. Default is 0 which disables it.
+  - `shiftwidth` (numeric): Affects shifting commands such as `<`. Default is 8.
+
+  In reality 99% of the time you will want to set all 3 numeric options to the same value (probably 4) and then set `expandtab` based on whether you want to use tabs or spaces.
+  The granular control that these options give you is mostly only useful if you want to work with a mixture of tabs and spaces (you sicko).
+
+## 23: Some useful options
+
+  You can toggle a boolean option by putting `!` at the end. Combine this with `@:` to toggle back and forth quickly. You can set a boolean option to true with `:set <option>` to to false with `:set no<option>`
+
+  - `number` and `relative` number for displaying line numbers.
+  - `wrap` for wrapping long lines.
+  - `smartcase` to make search case insensitive unless it includes uppercase letters.
+  - `clipboard=unnamedplus` to use system clipboard for yank, delete etc.
+  - `scrolloff` sets a number of lines to always keep visible above/below cursor.
+  - `cursorline` highlights the line your cursor is on.
+
+## 24: J
+
+  `J` will join the current line with the next line. This means that a space plus the content of the next line is added to the end of the current line and the next line is deleted. You can put a number before `J` to join more than two lines.
+
+  `J` can also be used in visual mode to join the selected lines.
+
+  `gJ` is the same as `J` but does not insert the space.
+
+  I find `J` to be most useful for creating a single line with a repeating pattern. For example, say I wanted to create 
+  ```python
+  [ some_long_name.x, some_long_name.y, some_long_name.z ]
+  ```
+  I would create
+  ```python
+  [
+  some_long_name.x
+  ]
+  ```
+  use `yypp` to get 
+  ```python
+  [
+  some_long_name.x
+  some_long_name.x
+  some_long_name.x
+  ]
+  ```
+  edit to
+  ```python
+  [
+  some_long_name.x
+  some_long_name.y
+  some_long_name.z
+  ]
+  ```
+  and finally `5J` to get the target text.
+
+  In this case you could just `yiWp` but imagine it's a more complex piece of text where you want to make multiple changes. Having it arranged over multiple lines can make this much easier especially with visual block mode.
+
+## 25: Jumping with []
+
+  There are a number of useful motions that start with `[` for the backwards motion and `]` for the forwards motion. Here are the backwards versions.
+  - `[(` Previous unmatched `(`
+  - `[{` Previous unmatched `{`
+  - `[[` Start of previous section (`{` in first column)
+  - `[]` End of previous section (`}` in first column)
+  - `[m` Start of previous method
+  - `[M` End of previous method
+  - `['` Previous mark
+  - `[s` Previous mispelt word
+  - `[/` Previous C-style comment
+  - `[z` Start of the open fold you are currently in
+
+## 26: Folds
+
+  Folds allow you to hide blocks of code.
+  By default `foldmethod` is `fold-manual`. Manually create folds with `zf<motion>` or visual select then `zf`. Alternatively, set `foldmethod` to `fold-indent` to automatically create folds based on indentation (there are a few other options for `foldmethod` as well).
+
+  Open and close:
+  - `zc` Close fold
+  - `zC` Close fold recursive
+  - `zo` Open fold
+  - `zO` Open fold recursive
+  - `za` Toggle fold
+  - `zA` Toggle fold recursive
+
+## 27: Fold Levels
+
+  `foldlevel` is a vim option that determines how many levels of folds are open. A `foldlevel` of 0 means that all folds are closed. A `foldlevel` of 999 means that all folds will be open (unless you have stupidly nested folds).
+
+  This is useful for giving a high level overview of a class or function.
+
+  `zR`: Set `foldlevel` to maximum. This opens all folds.
+  `zM`: Set `foldlevel` to 0. This closes all folds.
+  `zr`: Increase `foldlevel` by 1. This opens one more level of folds.
+  `zm`: Decrease `foldlevel` by 1. This closes one more level of folds.
+  `zX`: Undo manually opened and closed folds and reapply `foldlevel`.
+
+
+## 28: Count
+
+  You can prepend most normal mode commands (anything that makes sense to do multiple times) with a number to perform the command that many times.
+  For example `dd` deletes a line while `10dd` will delete 10 lines.
+
+## 29: =
+
+  Use `==` to automatically indent the current line to the correct level.
+  You can also use `=` in visual mode or `=<motion>` to indent multiple lines
+
+
+## 30: Entering visual mode
+
+  There are a few ways to enter visual mode other than the usual `v`.
+  - `gv` will enter visual mode and reselect the previous selection (ie. between `<` and `>` marks from tip 10).
+  - `gn` works like `n` and takes you to the next search result but then visually selects the match.
+  - `gN` works like `N` and takes you to the previous search result but then visually selects the match.
+
+  Bonus tip: The mapping `vnoremap < <gv` will mean that, after indenting text you visually selected, that text will be reselected. This allows you to quickly indent multiple lines of code by multiple levels. You can do similar for unindent (`<`)
+
+## 31: Visual block mode
+
+  Visual block mode allows you to edit multiple lines at once (very useful). The selection will always be a rectangle.
+
+  Enter visual block mode with CTRL-V and then use your usual motions to move the end of the selection. You can switch to moving the opposite corner with `o`.
+
+  Use `I` to insert text at the start of the block on each line in the block.
+  Use `A` to insert similarly but at the end of the block.
+  `x` or `d` will delete the text in the block.
+
+## 32: Visual block end of line
+
+  Often you will want to add some text to the end of a bunch of lines which are different lengths. In visual block mode you can use `$` to extend the selection to the end of the lines (this does make the selection non-rectangular), then use `A` to append to the lines.
+
+  If You want to delete from the end of some lines which are different lengths you can do the following:
+  - Select the lines with any visual mode.
+  - `:ri[ght]` to right align the text. This will right align to column 80. If your lines are longer than this do `:ri<big-number>`
+  - Visual block select the ends of the lines.
+  - `d` to delete.
+  - `gv` to reselect the lines.
+  - `=` to fix the indentation. Or `:le[ft]` and then fix manually
+
+## 33: Do
+
+  There are several commands that allow you to to execute a command across many "things".
+
+  - windo: In each window 
+  - bufdo: In each buffer
+  - tabdo: In each tab
+  - cdo: On each line in the quickfix list
+  - cdfo: On each file in the quickfix list 
+  - ldo: On each line in location list
+  - lfdo: On each file in location list
+  - argdo: On each file in the argument list (the list of files passed to vim when started)
+
+## 34: Ranges
+  Many Ex-commands will accept a range of lines that they will operate on. A range consists of two line specifiers separated by either `,` or `;`. The difference between `,` and `;` is that `;` will set the cursor position to that line before interpreting the next specifier. This is mostly useful with the searching specifiers
+
+  Line specifiers:
+  - `5`: Line 5
+  - `$`: Last line in file
+  - `.`: Current line
+  - `'a`: The line with the `a` mark
+  - `/foo/` the next line matching `foo`
+  - `?foo?` the previous line matching `foo`
+  - `\/` next line with the most recent search pattern
+  - `\?` previous line with most recent search pattern
+  - `\&` next line with most recent substitute pattern
+
+  You can also add or subtract offsets from line specifiers. For example `5,$-2` means between line 5 and the third to last line.
+
+  There is also the special range `%` which covers the whole file (same as `1,$`).
+
+## 35: Substitute
+
+  You can substitute text using `:s/old_text/new_text/`
+
+  This will only operate on the current line and will only substitute the first instance of `old_text` on that line.
+
+  We can add a range of lines before the command so that the substitute will operate on multiple lines. The most common example is `:%s/old/new/g` to substitute on all lines but any ranges from the previous tip will work.
+
+  There is also full regex support for `old_text`.
+
+  See `:h :s` for more.
+
+## 36: Substitute flags
+
+  We can add flags after the substitute command to change its behaviour. These come after the command, for example, to add the `g` flag we do `:s/old_text/new_text/g`.
+
+  Useful Flags
+  - `&` Keep the flags from the previous substitute
+  - `c` Requires you to confirm each substitution with `y`. Useful when you want to rename variable `foo` where `foo` might appear in other contexts where you don't want to replace it.
+  - `g` Replace all occurrences in a line. You will use this flag a lot.
+  - `i`/`I` Ignore case/Don't ignore case. Without these flags it will use your `ignorecase` and `smartcase` options.
+  - `n` Don't substitute and just count the matches instead. Useful for seeing how many things will be substituted before actually doing it.
+
+  There are more flags but they are less useful for usual use. See `:h :s_flags` for more.
+
+## 37: Autocommands
+
+  Autocommands allow you to automatically run commands when certain conditions are met.
+
+  ```
+  :autocmd BufRead,BufNewFile *.txt set number
+  ```
+  This autocommand can be broken down:
+  - `BufRead,BufNewFile`: These are the events that trigger the autocommand. In this case, the autocommand triggers when starting to edit a buffer after loading a file into it or when starting to edit a file that doesn't already exist.
+  - `*.txt`: This is a filename pattern that must match for the autocommand to trigger. In this case, we must be editing a file ending with `.txt`.
+  - `set number`: This is the command that is executed. In this case we are just setting the `number` option (which will give us line numbers).
+
+  To see all events that can trigger an autocommand, see `:h events`.
+
+  While autocommands can be created using an Ex-command, this will only last for your current session. You can instead put them into `~/.vimrc` so they are always set.
+
+## 38: Diff
+
+  Vim has a diff mode.
+
+  ```
+  vim -d file1 file2
+  ```
+
+  Jump between changes with `[c` and `]c`
+
+  `do` will obtain the diff from the other window into the current window.
+  `dp` will put the diff from the current window into the other window.
+
+  You can use `CTRL-W` followed by either `h` or `l` to move between them (see tip 12).
+
+## 39: Git diff
+
+  You can use vim's diff mode to view git diffs.
+
+  You probably want to set the following git config options
+  ```
+  git config --global merge.tool vimdiff
+  git config --global mergetool.prompt false
+  git config --global difftool.prompt false
+  ```
+
+  `git mergetool` will use vim's diff mode for resolving merge conflicts.
+  `git difftool ref1 ref2` will diff between two git refs. Omit `ref1` to use the working tree.
+
+
+## 40: Views
+
+  The command `:mkview [file]` will write a vimscript to `[file]` that recreates the contents of the current window. If ommitted, a file will be created in `~/.vim/viewfiles/view`. If `[file]` is a number 0-9, then a file is created similarly to if `[file]` was ommitted, however, this allows you to save multiple "slots" (multiple views) for a single file.
+
+  Load a view to recreate the window. The command for this is `:loadview [slot]`
+
+  This is useful if you are in the middle of a complex editing session where you have manually set different options, created folds etc. and want to restore this later.
+
+  See `:h :mkview` and `:h views-sessions` for more
+
+## 41: Sessions
+
+  A session contains all the views for all windows and any global settings.
+
+  `:mks[ession] [file]` will create a session file with the provided file name. Omitting the file name creates thes a file called `Session.vim`.
+
+  You can load a session file when starting vim with `vim -S [file]`
+
+  From vim you can do `:source [file]`
+
+  This can be useful for switching between tasks or projects where you want different sets of files loaded and different window setups.
+
+## 42: ShaDa
+
+  The ShaDa (Shared Data) file stores status information to be carried between vim sessions.
+
+  This includes:
+  - Command line and search history
+  - Registers
+  - Marks
+  - Buffer list (disabled by default)
+  - Global variables
+
+  When you exit vim, it will save to the shada file. When you start vim it will read from it.
+
+  You can change what and how much is saved using the `shada` option.
+
+  You can manually read and write to the shada file with `:wshada [file]` and `:rshada [file]`, but usually the ShaDa file just works in the background and you don't need to think about it.
+
+  The ShaDa file is only available on Vim 8 and later and it is compatible between Vim and Neovim. For older versions of Vim, the viminfo file works very similarly.
+
+  See `:h shada` for more.
+
+## 43: vimrc
+
+  You can create a vimrc file at `~/.vimrc` to hold your vim config.
+
+  The file should contain vimscript commands and will be ran each time vim starts.
+
+  The most useful and easiest things to put here are mappings and options.
+
+  Mappings can be set with map commands (`:h map-overview`)
+  Most useful is `:nnoremap`. The first `n` means that the mapping only applies in normal mode and `noremap` means that the mappings are not applied recursively to the output of the mapping.
+
+  Here is a short vimrc with some mappings that make navigating between windows easier and some options set.
+  ```
+  nnoremap <C-h> <C-w>h
+  nnoremap <C-j> <C-w>j
+  nnoremap <C-k> <C-w>k
+  nnoremap <C-l> <C-w>l
+
+  set cursorline
+  set smartcase
+  ```
+
+## 44: Leader key
+
+The leader key is a special key that you can use in your mappings.
+
+  Set the leader key with e.g. `let mapleader = " "` (sets it to space) in your vimrc.
+You can use the leader key in mappings e.g. `nnoremap <leader>w :w!<CR>`.
+
+  You could not set the leader key and do `nnoremap <Space>w :w!<CR>`. The advantages of using the leader key as a prefix are:
+- Easily change many mappings by changing the leader key.
+- Can have different leader keys in different contexts.
+- Separate custom mappings from built in ones.
+
+I would recommend setting the leader key to something easy like space or comma and then prefixing all custom mappings with it. This way, if you ssh to a remote machine without your mappings, you know exactly what you are missing.
+
+There is also `localleader`. This works very similarly. The intention is for this to be used for buffer specific/filetype specific mappings. You don't have to do this though or you can even set leader and localleader to be the same key.
+
+See `:h mapleader` for more.
+
+## 45: Case
+
+Vim has a number of features for toggling case (lowercase/uppercase)
+
+  `~` will toggle case of the character under the cursor and advance the cursor to the next character. This can be useful for converting from camelCase to PascalCase (or vice versa) or just generally capitalising words.
+
+`gu` is the lowercase command. You can either `guu` to lowercase the whole line or `gu{motion}` to lowercase between the cursor and the result of the motion.
+
+`gU` is the uppercase command. It works in the same way as `gu`.
+
+In visual mode, `U` will uppercase text, `u` will lowercase it and `~` will toggle the case.
+
+## 46: Scrolling
+
+The most useful scrolling commands are `CTRL-U` to scroll half a screen up and `CTRL-D` to scroll half a screen down.
+
+For more fine grained scrolling you can use `CTRL-Y` to scroll one line up and `CTRL-E` to scroll one line down. You can prepend these with a count to scroll that many lines.
+
+There are also three very useful commands for scrolling relative to the cursor.
+- `zz` puts the cursor line in the middle of the screen.
+- `zt` puts the cursor line at the top of the screen.
+- `zb` puts the cursor line at the bottom of the screen.
+
+Jumping to the start of a function then doing `zt` will allow you to see as much of the function as possible.
+
+## 47: Tags
+
+Tags allow you to navigate to the definitions of variables, functions and classes.
+
+Tags use a tag file which you need to first generate. For example running `ctags -R .` from the project's directory will generate a tags file for the project.
+
+Back in vim we can now do:
+ -- `:tag identifier` jump to the definition of `identifier`
+--- `CTRL-]` jump to definition of identifier under cursor
+
+## 48: Help
+
+You can open the help file in a new window with `:h`. You can open the help file to a specific tag with `:h tag`.
+
+You can navigate the help file like any other buffer except that it's read-only. Additionally, `gO` (capital o rather than zero) will open the table of contents for the help file.
+
+There are tags setup for the help files. This means that you can cursor over a keyword and use `CTRL-]` to jump to it (like clicking hyperlinks to other pages on Wikipedia).
+
+Close the help window with the usual `:q`.
+
+## 49: !
+
+You can execute shell commands with `:!{cmd}`.
+
+`:!!` will execute the previous shell command again.
+
+Inside of `{cmd}`, `%` will be replaced with the current file name.
+
+## 50: gvim
+
+There is a GUI version of Vim called GVim. This is part of vim but needs to be enabled when vim is compiled. Since you likely didn't compile Vim yourself, you can install it separately. `gvim` isn't supported on Mac but MacVim aims to do a very similar thing. 
+
+## 51: Neovim
+
+Neovim is a fork of Vim. It adds some user facing features such as the ability to run a terminal inside of a buffer. However, the main changes general backend improvements. These improvements make it much easier to configure, create plugins for and contribute to Neovim. There are a lot of plugins written specifically for Neovim, plus all Vim plugins still work withNeovim. Neovim configurations and plugins can use the Lua language which is much easier to work with over Vimscript.
+
+You will still want to be using Vim when sshing to a remote machine (which won't have Neovim installed) but, for local use, it's hard to justify using Vim over Neovim.
+
+## 52: vim-surround
+
+vim-surround is a vim plugin from your main man t-pope. It's purpose is to allow you to easily add, remove and change surrounding characters such as braces or quotes.
+
+You can delete surrounding characters with `ds<char>`. For example, with your cursor in the middle of `"Hello"`, entering `ds"` would leave you with `Hello`.
+
+You can change surrounding characters similarly with `cs<oldchar><newchar>`.
+
+Adding surrounding characters requires a motion. For example, `iw` is the motion for selecting inside a word. `ysiw"` will surround the word with double quotes. You can think of this as "You surround in word (with) double-quote".
+
+When adding or changing to braces/parentheses/brackets, using the opening form will also add a space while the closing form wont. For example, with the cursor in `Hello`, `ysiw{` produces `{ Hello }` while `ysiw}` produces `{Hello}`.
+
+## 53: vim-repeat
+
+This is a simple plugin (also from your main man t-pope) which makes the commands of plugins repeatable using `.`
+
+  For example, it works with `vim-surround`. If I wanted to surround my word with triple double quotes (e.g. python docstring) I can now do `ysiw"l.l.`. 
+
+## 54: Plugin managers
+
+Once you have a few plugins, it becomes difficult to manage them. To solve this, you can use a plugin manager.
+
+For vanilla vim, I would recommend [vim-plug](https://github.com/junegunn/vim-plug). You just need to download one file, put it in the correct place, then add plugins to your config with `Plug 'tpope/vim-surround` (surround these with `call plug#begin()` and `call plug#end()`. Run `:PlugInstall` to install all the plugins.
+
+For Neovim, I would recommend [lazy.nvim](https://github.com/folke/lazy.nvim). You need to add a few lines to your `init.lua` config file and then give a table of plugins to load to the `setup` function. One of the key features of this plugin manager is that it can lazy load plugins: for example, waiting until you use a particular mapping to load the associated plugin. It also has a great interface you can access with `:Lazy`.
+
+## 55: fugitive
+
+Fugitive a plugin that brings git integration to vim. You can already execute git commands from vim with e.g. `:!git pull`. Fugitive improves many of these commands via `:Git` (or just `:G`). For example, `:Git blame` will open a window on the left containing the author for each line; pressing enter on any line in that window will open the diff for that commit in a new buffer.
+
+Fugitive also adds new functionality such as `:Gedit` which can open any revision of a file or `:GBrowse` which opens the current file in Gitlab.
+
+https://github.com/tpope/vim-fugitive
+
+## 56: Editing the quickfix list
+
+You can remove items from the quickfix list:
+1. `:set modifiable` in the quickfix window.
+2. Delete lines manually or with `:g/[pattern]/normal dd`.
+3. `setlocal errorformat=%f\|%l\ col\ %c\|%m`: This allows you to read the quickfix buffer back in as an error list.
+4. `:cgetbuffer` to re-read the quickfix list.
+
+Steps 2. and 3. are needed since, without them, pressing enter on things in the qf list will still link to things you deleted.
+
+## 57: Adding and subtracting
+
+You can add one to a number with `CTRL-A` and subtract one from a number with `CTRL-X`. It doesn't matter where in the number your cursor is.
+
+This is useful for manually adjusting numbers but is particularly powerful when combined with macros.
+
+For example, starting on a line containing just `1`, repeatedly executing the macro `yyp<C-A>` will create an ascending list of numbers.
+
+You can also use this as a counter in a macro. For example, get the number 1 in register c, put yourself on a line which is just a word e.g. "Hello", execute `"hyiw` to yank "Hello" into register `h` and repeatedly execute the simple macro `o<ESC>"cp<C-A>"cdiw:normal <C-R>c"hp`. This will produce:
+```
+Hello
+HelloHello
+HelloHelloHello
+HelloHelloHelloHello
+...
+```
+
+The macro works by:
+- `o<ESC>`: Create a new line
+- `"cp`: Put the current value from the counter register `c`.
+- `<C-A>`: Increment the counter.
+- `"cdiw`: Delete the counter and save back into register `c`.
+- `:normal <C-R>c"hp`: Puts (`p`) from register `h` (`"h`) a number of times equal to the value in register `c` (`<C-R>c`).
+
+You could even use this to emulate a CPU with Vim macros using Vim registers as CPU registers.
+
+## 58: VimGolf
+
+[VimGolf](https://www.vimgolf.com/) is a site containing challenges. The aim is to convert some input text to some specific output in as few keystrokes as possible.
+
+You need to install the vimgolf gem (ruby package manager) since you use a specifically setup `.vimrc`.
+
+The only downside is that you can only see solutions with the same or more keystrokes than your solution. Without submitting a solution you can only see the worst solution which is usually pretty manual.
+
+## 59: Inserting multiple times
+
+Commands that take you into insert mode can also be prepended with a count to insert multiple copies of the text you type.
+
+For example, to make a dotted line of width 100 you can do `100i.<ESC>`.
+
+This also works for `o` and `O` (which add a line below/above and put you in insert mode at the start of that line). For example, `100oHello<ESC>` will give you 100 new lines below the current line each with the text `Hello`.
+
+You will only see the extra copies appear once you leave insert mode.
+
+## 60: Ascending/descending numbers
+
+There is an even easier way to make a list of ascending/descending numbers using `g<CTRL-A>` in visual mode. 
+
+- Start with `100o0<ESC>` to make 100 lines each as the number 0.
+- Select these 100 lines in visual mode however you like.
+- While `<CTRL-A>` would increment these all to `1`, `g<CTRL-A>` will increment each line by one more than the previous. This will give you the numbers 1 to 100.
+
+To make the numbers descending, start with `100o101<ESC>` to get all 101's then use `g<CTRL-X>` to decrement in a similar way. The result will be the numbers 100 to 1.
+
+## 61: VimGolf tips
+
+- End with `ZZ` since this is one less key than `:x` and two less than `:wq`.
+- `:<cmd1>|<cmd2>` is one less key than `:<cmd1>` then `:<cmd2>`.
+- `H` will usually do the same thing as `gg` while being one less key. 
+- `<lineno>G` is one less key than `:<lineno>`.
+- `Y` does the same thing as `yy`.
+
+Just because these are fewer keystrokes doesn't mean that you should use them in normal usage. For example, executing two commands separately is usually easier to think about and allows you to see the effect of the first one before executing the second one. I also still use `:wq` over `ZZ` since it's similar to `:w`, `:q` etc.
+
+## 62: Recursive Macros
+
+You can call a macro from within itself to create a recursive macro. There are two key things to make this work.
+
+- Start by clearing the macro with `q<macro_register>q`, otherwise you will end up calling some existing macro when defining your recursive one.
+- Ensure that something in your macro will error when the recursive process is done. This stops it from recursing forever. 
+
+For example, `qqqqqj@qq@q` is a recursive macro for moving to the bottom of the file with `j`.
+- `qqq`: Clear register `q`.
+- `qq`: Start recording into `q`.
+- `j@q`: The actual content of the macro. We move down one line with `j` and then recursively call macro `q`.
+- `q`: Finish recording macro.
+- `@q`: Run the macro.
+
+Executing `j` on the final line in the file will error and end the recursive macro.
+
+In this case, you would obviously just use `G` for the same affect. However, we can imagine a more complex scenario where we need to run the macro lots of times but don't know exactly how many: in this case, a recursive macro could be a good solution.
+
+## 63: Expressions in substitution
+
+A substitution takes the form `:<range>s/<pattern>/<replacement/<flags`.
+
+Starting the replacement with `\=` will mean that it is evaluated as an expression. For example `:%s/foo/\=line('.')/g` will replace all instances of `foo` with the line number of that line.
+
+
+## 64: Conditionals
+
+Vim supports the typical if/else conditional structure as follows:
+
+```
+:if <expression>
+:  <cmd>
+:elseif <expression>
+:  <cmd>
+:endif
+```
+
+This can be useful for macros where you want it to do something different depending on some expression: for example, yanking part of the line into a register and then checking if it is equal to some string.
+
+Vim also supports a shorter syntax for expressions:
+
+`<expression1> ? <expression2> : <expression3>`
+
+If `expression1` is true, this evaluates to `expression2`, otherwise it evaluates to `expression3`.
+
+## 65: loops
+
+Vim supports the usual loop structures
+
+```
+:while <expression>
+:  <cmd>
+:endwhile
+```
+
+```
+:for <var> in <object>
+:  <cmd>
+:endfor
+```
+
+`<object>` can be a list (`[1, 2, "hello"]`), string (`"hello"`) or a binary blob (iterate over bytes).
+
+`:continue` and `:break` are also available for skipping the rest of the current iteration and breaking out of the loop respectively.
+
+## 66: Variables
+
+You can set a variable with:
+
+`:let <var> = <expression>`
+
+(You can also set a register with similar syntax: `:let @<register> = <expression>`)
+
+Vim has the following variable types:
+- Number: `:let foo = 10`, `:let foo = 0x1F`
+- Float: `:let foo = 0.12`, `:let foo = 1.13e-2`
+- String: `:let foo = "Hello"`
+- Funcref: `:let Foo = function("strlen")`
+- List: `:let foo = [1, 2, "Hello"]`
+- Dictionary: `:let foo = {"bar": 2, "baz":3}`
+- Blob (binary data): `:let foo = 0zFF0013`, `:let foo = readfile("image.png")`
+
+## 67: oil.nvim
+
+[oil.nvim](https://github.com/stevearc/oil.nvim) is a Neovim plugin that allows you to edit directories in a vim buffer. 
+
+For example, you can create a copy of a file with `yyp` then editing the new file's name.
+
+You can also edit multiple files at once, for example using visual block mode to change the file extension of many files in one go.
+
+It also makes moving files around very easy. You can visually select some files, `d` to delete them, navigate to the directory you want to move them to and `p` to put them there.
+
+It's not doing anything that you couldn't already do with bash but it's faster and more visual which allows you to see what you have done wrong earlier. Additionally, none of your changes take affect until you write the buffer and, even then, you have to confirm a list of operations it will perform.
+
+## 68: Command line vim keybinds
+
+Many shells have a Vim mode. Some of the most useful parts of this are being able to move the cursor quickly through a long prompt with `w` and `b` as well as replacing parts with `ciw` or similar.
+
+In `zsh`, running `bindkey -v` will enable this mode. Add it to `~/.zshrc` to permanently enable.
+
+In `fish`, running `fish_vi_key_bindings` will enable this mode. Add the following to `~/.config/fish/functions/fish_user_key_bindings.fish` to permanently enable.
+
+```
+function fish_user_key_bindings
+    fish_vi_key_bindings
+end
+```
+
+In `bash`, running `set -o vi` will enable this mode. Add it to `~/.bashrc` to permanently enable.
+
+## 69: ADM-3A
+
+This is the keyboard that Bill Joy used when he created Vi, it is part of the ADM-3A terminal.
+
+Some key features that influenced Vi (and therefore Vim):
+- Esc is easy to press
+- Arrows on hjkl
+- Ctrl is easy to press
+
+## 70: Jumping to specific places
+
+You will often get errors from your code which tell you where in the file the error has occurred. It is useful to be able to jump straight there.
+
+To jump to a specific line, you can do `:<line_no>` or `<line_no>G`.
+
+To jump to a specific column, you can do `<line_no>|`.
+
+To jump to a specfic character in the buffer, you can do `:goto <character_no>` (this actually jumps to a specific byte in the file but this should generally work for jumping to a specific character. For files with multi-byte characters you can use `search('\m\%^\_.\{'.a:index.'}', 'es')` instead).
+
+## 71: leap.nvim
+
+[leap.nvim](https://github.com/ggandor/leap.nvim) is a Neovim plugin that allows you to move to any specific point on the screen in a maximum of four key strokes. 
+
+You first press a key to start the search. By default this is `s` to search forwards and `S` to search backwards.
+
+You then type the first two characters after the point you want to jump to. 
+
+If it turned out that you wanted to jump to the first instance of those two charcters then you are now already there. 
+
+Otherwise, each other instance of those characters is now labelled with a random third character. Press that character to jump there. 
+
+One of the key reasons that this is so fast, is that the labels appear after typing only the first character. This gives to time to see and mentally process the label while typing the second character.
+
+The default mappings are kind of silly though imo. `s` (delete character under cursor and enter insert mode) and `S` (delete contents of line and enter insert mode) are useful as they are. I personally map to `m` (place mark) and `M` (move cursor to middle of screen). I then map placing marks to `,` (repeat previous `f/F/t/T` motion).
+
+I would reccommend not overriding default mappings as much as possible but leap is so useful (and something I want to be able to use quickly) that it is the only exception I make.
+
+
+## 72: Encryption
+
+You can encrypt files with `:X`. This will prompt you to enter a key twice. The next time that you open the file in vim, it will ask for the key.
+
+You should ensure that `:set cm` returns `blowfish2` before using this. The `blowfish` implementation was very badly implemented and insecure.
+
+This feature is not available in Neovim as the developers [decided to remove it](https://github.com/neovim/neovim/issues/694) due to the insecurity of the `blowfish` implementation and them feeling that a complex area like cryptography shouldn't be handled by a text editor. I couldn't really find any encryption plugins for Neovim but you can always do something like `:w !gpg --symmetric -o %:r.gpg` to create an encrypted version of the current file and `:r !gpg --decrypt file.gpg` to decrypt (or even an autocommand that automatically decrypts files with the `gpg` extension).
+
+## 73: Custom commands
+
+You can define a custom command with `:command <name> <command_contents>`. User-defined commands must start with an uppercase letter.
+
+For example: 
+```
+:command Encrypt w !gpg -symmetric -o %:r.gpg
+```
+
+If you want to have a more complex command with multiple steps or branching, you will likely want to create a function. Functions are more complex than commands: they can have multiple lines, parameters, return values and have to be called with `:call`.
+
+For example, in your `.vimrc`: 
+```
+function! EncryptFunction()
+  echo "Starting encryption"
+  w !gpg -symmetric -o %:r.gpg
+  echo "Finished encryption"
+endfunction
+
+command! Encrypt call EncryptFunction()`
+```
+
+Here I use a `!` after `command` and `function` to override any existing command/function with that name.
+
+In Neovim, using Lua, you would do
+```lua
+vim.api.nvim_create_user_command(
+  "Encrypt",
+  function(_)
+    print("Starting encryption")
+    vim.cmd("w !gpg -ssmmetric -o %:r.gpg")
+    print("Finished encryption")
+  end,
+  {},
+)
+```
+
+## 74: Advanced shell commands
+
+In tip 49, we learnt that you can run shell commands from inside Vim with `:!{cmd}`.
+
+Often we may want to use the current buffer as input/output to that command.
+
+`:w !{cmd}` will write the contents of the current buffer to the `stdin` of the command like `{cmd} < {file}`.
+
+`:r !{cmd}` will read the ouput of the command into the current buffer like `{cmd} > {file}`.
+
+If you wanted to read into a new buffer, first do `:enew` to create a new empty buffer.
+
+If you wanted to both write a buffer as input to a command and read the output into a buffer then you would need something more complex. You could just use the filename in the command. For example, the command `:enew | r!grep foo #` creates a new buffer with `enew` then `grep`s for `foo` in the alternate buffer file (this is the buffer you were in immediately before this one and you can get its path with `#`) and outputs the result to the new buffer. The downside is that this won't work on unwritten changes or buffers populated by other commands.
+
+You can instead utilise a temporary file: `execute "w !grep foo > /tmp/123" | enew | r /tmp/123`. I am using `execute` here so that it doesn't try and include `| enew ...` as part of the shell command.
+
+And even cleaner way would be to use a variable rather than a temporary file.
+
+`let tmp = execute("w !grep foo") | enew | put =tmp`
+
+Here we use the function form of `execute` (with the paraenthesis) rather than the command form (without them) since the right hand side of the `let` must be an expression. The `put` command expects a register so we use the special `=` register from tip 7 which allows us to evaluate an expression in place of specifing a register.
+
+We may also want to add `| 1d` to the end of these commands. We are creating a new buffer which will have a single empty line and then adding the command output below it: this leaves us with a single blank line at the start. `{range}d[elete]` deletes the lines specified by the range (in this case the first line).
+
+## 75: Vimscript from Lua
+
+There are a lot of ways of calling vim commands/functions from Lua in Neovim which can be confusing.
+
+- `vim.cmd`: For executing one or more commands and you don't care about the output of the command.
+- `vim.api.nvim_cmd`: For executing a single command and getting the output. Command passed as a table.
+- `vim.api.nvim_exec2`: For executing multiple commands. Commands in a string separated by new lines.
+
+There are also some functions you probably shouldn't use:
+- `vim.api.nvim_command`: Older version of `nvim_cmd`. The difference is that it takes a string like `nvim_exec2`.
+- `vim.api.nvim_exec`: Deprecated in favour of `nvim_exec2`.
+- `vim.fn.execute`: Calls vim's execute function which executes a command.
+
+## 76: Manually editing the quickfix list
+
+Here is a Neovim mapping that will manually add the current line to the quickfix list:
+```lua
+vim.keymap.set(
+    "n",
+    "<leader>ca",
+    "<cmd> caddexpr expand('%') .. ':' .. line('.') .. ':' .. getline('.') "
+        .. "| copen <CR>"
+)
+````
+This uses `caddexpr` to add to the quickfix list. `expand('%')` gets the current filename, `line('.')` gets the current line number and `getline('.')` gets the content of the line; when separated by colons, these give enough information, in the right format, that you can jump to that location from the quickfix list.
+
+Here is an autocommand that will allow you to delete items from the quickfix list:
+```lua
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "qf",
+    callback = function()
+        vim.keymap.set("n", "dd", function()
+            local current = vim.fn.line(".")
+            local qf = vim.fn.getqflist()
+            if #qf == 0 then
+                return
+            end
+            table.remove(qf, current)
+            vim.fn.setqflist(qf, "r")
+            vim.cmd("copen")
+            local new_position = current < #qf and current
+                or math.max(current - 1, 1)
+            vim.api.nvim_win_set_cursor(vim.fnwin_getid(), { new_position, 0 })
+        end, { buffer = 0 })
+    end,
+})
+```
+
+We use an autocommand to set a buffer specific mapping only when the filetype is `qf`.
+The mapping gets the quickfix list as a lua table, deletes the current line from it, sets the result as the quickfix list, refreshes the quickfix list and finally resets the position of the cursor.
+
+
+## 77: LSP
+
+The LSP (Language Server Protocol) allows editors like Neovim or VSCode to communicate with processes that provide features such as code completion, code refactoring/formatting, diagnostics, hover information, etc. for a particular language.
+
+Neovim has built in support for the LSP via its `vim.lsp` module. There are two key concepts here: 
+- An LSP Server is a running process. You will install different servers for different languages via your OS package manager. Anyone can make an LSP and so you will find multiple different implementations with different features for any popular language.
+- An LSP client is created by Neovim to communicate with a particular LSP on behalf of a single buffer. It handles getting the appropriate information from the buffer to send to the LSP server as well as applying any responses.
+
+Here is an example:
+
+```lua
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "python",
+    callback = function()
+        local root_dir =
+            vim.fs.dirname(vim.fs.find({ ".git" })[1])
+        local jedi = vim.lsp.start({
+            name = "Jedi",
+            cmd = { "jedi-language-server" },
+            root_dir = root_dir,
+        })
+        vim.lsp.buf_attach_client(0, jedi)
+    end,
+})
+```
+
+I am using an auto-command to automatically create and attach a client to any buffer with the `filetype` of `python`. I find a `.git` file to determine the root of the project. `vim.lsp.start` is used to start the LSP server; if there is already an instance of `jedi-language-server` running, this will just return a reference to that. Finally, I attach a client to the current buffer (`0`).
+
+If you wanted to be able to more easily add LSP servers with sensible setups, you can use [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig). This plugin also allows you to easily start, stop and manage your running LSP servers. I used to use this plugin but I find that it overcomplicates things a bit when I just want a few simple LSP servers.
+
+Another popular plugin is [mason.nvim](https://github.com/williamboman/mason.nvim) which acts as a plugin manager for LSP servers. I personally find it easier to just use the OS package manager, especially for python where I want to install the LSP server package into my venv.
+
+Finally, there is [none-ls.nvim](https://github.com/nvimtools/none-ls.nvim). This plugin allows use to use programs (or Lua functions), that are not LSP servers, like they are. For example, the `black` python formatter or `pylint` python linter are not LSP servers but none-ls allows you to to trigger formatting with the same command and as for LSP servers and get diagnostics in the same way. None-ls provides builtins for many popular formatters and linters.
+
+## 78: Insert mode special keys
+
+- `CTRL-A`: Inserts the text from the previous insert.
+- `CTRL-W`: Delete word before cursor.
+- `CTRL-U`: Delete all characters in line before cursor from current insert.
+- `CTRL-R {register}`: Insert contents of register.
+- `CTRL-X`: Insert mode completion
+- `CTRL-E`: Insert character from line below.
+- `CTRL-Y`: Insert character from line above.
+- `CTRL-O`: Takes you to normal mode for a single command.
+
+
+Full list at `:h ins-special-keys`
+
+## 79: Insert mode completion
+
+    You can start insert mode completion with `CTRL-X CTRL-?` where the second character determines the type of completion to use.
+
+Some key completion types are:
+- `CTRL-X CTRL-L`: Completion for whole lines in the current file.
+- `CTRL-X CTRL-N`: Completion for keywords in the current file.
+- `CTRL-X CTRL-F`: Completion for filenames.
+
+Full list at `:h ins-completion`
+
+The completion options appear in a pop-up menu. Use `CTRL-N` and `CTRL-P` to go to the next/previous option. `CTRL-Y` will select an option and `CTRL-E` will exit completion.
+
+## 80: Keywords
+
+The option `iskeyword` determines which characters are considered to be parts of a keyword.
+
+The default value is `@,48-57,_,192-255`. The `@` represents all alpha characters, `48-57` are the digits, underscores are allowed, and `192-255` are additional alpha characters with accents. You probably don't want to change this since it matches what is typically allowed for variable names but you could if e.g. you wanted to allow dashes in your keywords for certain filetypes.
+
+The concept of a keyword is used in many places in vim:
+- `*` and `#` search for the keyword under the cursor (forwards/backwards).
+- `w`, `e`, `b` and `ge` move forwards/backwards to the start/end of keywords.
+- `CTRL-X CTRL-N` provides completion for keywords.
+- `[i` and `]i` show first line containing the keyword under the cursor (search starting from start of file and current cursor respectively). Change `i` to `I` to display all lines with that keyword.
+- `\k` in a regex pattern matches keyword characters. `\<` and `\>` match the start and end of keywords respectively.
+
+## 81: Replace mode
+
+You can enter replace mode with `R`.
+
+This mode is like insert mode but you delete a character from the old line with each new character you type: the new characters replace them.
+
+You can enter Virtual Replace mode with `gR`. This is like replace mode but operates on screen space rather than characters. This mostly only matters for tabs: in Virtual Replace mode a single tab would replace multiple characters.
+
+## 82: Spelling
+
+You can enable spellcheck with `setlocal spell spelllang=en_gb`. We use `setlocal` here rather than `set` since you probably only want spellcheck in one buffer containing notes rather than all buffers.
+
+When enabled, misspelt words are underlined.
+
+`]s` and `]s` allow you to jump to the previous/next misspelt word.
+
+`z=` brings up numbered suggestions for the misspelt word. 
+
+`zG` and `zW` will mark the word under the cursor as "good" or "wrong" respectively, however, these are lost when you exit Vim.
+If you first set the `spellfile` option (the file must end in `.en_gb.add`), then you can use `zg` and `zw` which will add the word to the spellfile to be used in future.
+
+Vim generally won't spellcheck code. It will use the `filetype` to determine which syntax file to use and this syntax file will tell it what needs spellchecking. This means that it is able to spellcheck just the comments in your code.
+
+There is a whole documentation file (`:h spell.txt`) that contains more options/details about spell checking.
+
+## 83: Scrollbind
+
+The `scrollbind` option is window specific: all windows with this option set will scroll at the same time. This can be useful for comparing two files (if you are using Vim's built-in diffing then `scrollbind` will be automatically set).
+
+The behaviour of this can be changed with `scrollopt`.
+
+The command `:syncbind` is also useful for syncing up windows that became out of sync.
+
+## 84: File information
+
+`CTRL-G` will print the current filename, the current line and the total number of lines.
+
+`g CTRL-G` will print the current column and line of the cursor as well as the word, character and byte count.
+
+In visual mode, `g CTRL-G` will print the number of words, characters, lines and bytes of the visually selected text.
+
+## 85: Select mode
+
+Select mode is like visual mode but works like selections in other programs: typing any printable character will delete the selection, insert the character and leave you in insert mode.
+
+You can get to select mode with `gh` or `CTRL-G` from visual mode, `gH` for select-line mode and `g CTRL-H` for select-block mode.
+
+If you prefer using select mode over visual mode, you can look at the `selectmode` option.
+
+## 86: Status line
+
+The `statusline` option allows you to specify the contents of a status line that will appear at the bottom of the screen. If, after setting this option, you still don't see it, ensure that `laststatus` is 2.
+
+Typical things to put on your statusline would include: filename, file status, filetype, location in file and current mode.
+
+There are a lot of formatting options which you can see at `:h statusline`. You can even evaluate arbitrary expressions with `%!`.
+
+`:h statusline` also contains some examples which are a good starting place.
+
+For Neovim users there is [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) which is more modern and configured with Lua.
+
+## 87: Ruler
+
+The ruler typically contains your current location (rows/columns) in the file. When you have a statusline, setting the `ruler` does nothing since it is expected that you would have this information in your statusline anyways.
+
+The difference between a ruler and a statusline is that the ruler appears on the right side of the line which is used for Ex commands while the statusline takes up another whole line above this.
+
+The ruler has the same formatting available as the status line. The boolean `ruler` option is used to enable the ruler while `rulerformat` specifies its format.
+
+## 88: Colorcolumn
+
+The `colorcolumn` option is a comma-seperated list of column numbers which will be hightlighted. 
+
+This can be used to create useful guides if you want to keep you lines of code e.g. under 100 characters.
+
+## 89: Textwidth
+
+The `textwidth` option can be used to automatically wrap text onto new lines. Its value should be set to the number of characters at which wrapping occurs. It will not wrap in the middle of the word; it will move the last word (which goes past the `textwidth` column) to the new line.
+
+The `wrapmargin` option is similar but is relative to the end of the screen rather than an absolute width.
+
+## 90: gq
+
+The `gq` command formats text. You can either use the command from visual mode to format the selected text or use it from normal mode and follow it up with a motion.
+
+How the text is formatted is determined by the `formatoptions` option which is a sequence of single character flags. These flags can be found at `:h fo-table`. The key formatting is to make the text obey the `textwidth` option.
+
+## 91: Features
+
+Vim has many optional features which are enabled/disabled at compile time.
+
+You can find out which features you have enabled with `:version`. To know what these features do, check `:h :version`.
+
+Neovim always has all features enabled.
+
+## 92: Thesaurus
+
+You can get thesaurus suggestions with `CTRL-X CTRL-T` from insert mode.
+
+The `thesaurus` option is a comma separated list of file names used to lookup thesaurus suggestions. Alternatively, you can set `thesaurusfunc` to use a function to determine thesaurus suggestions (this could do anything, including calling some remote api).
+
+You can find a thesaurus file for English [here](https://github.com/vim/vim/issues/629#issuecomment-443293282)
+
+## 93: Regex
+
+There are many places in Vim where a regex pattern can be used. This is generally pretty standard but there are some important quirks.
+
+First, Vim has some non-standard rules about what characters need to be escaped with a backslash in a regex pattern. For example, a `+` is interpreted as a literal character while `\+` is the one-or-more qualifier. There are four different ways of interpreting Vim will interpret patterns. You can select between two of these with the `magic` option. You can use any particular one by starting your pattern with `\v`, `\m`, `\M` or `\V`. Full information is at `:h magic`, but I would generally recommend starting any serious regex pattern with `\v` to be more similar to PCRE.
+
+Another difference is for look-behind/look-ahead. `\@=`, `\@!`, `\@<=`, `\@<!` represent positive look-ahead, negative look-ahead, positive look-behind and negative look-behind respectively.
+
+Non-capturing groups are `\%(...)`.
+
+## 94: Neovim Distributions
+
+Neovim can do essentially anything with the help of plugins. However, for a new user switching from an IDE like VSCode, it is essentially impossible for them to manually configure all the features they want (LSP, debugging, completion, file explorer, tab bar, statusline, git integration, etc.). Distributions of Neovim are essentially a pre-made config that provides most of what you would want while still allowing you to override anything with your own configuration.
+
+The most popular distributions seem to be [LazyVim](https://www.lazyvim.org/), [NvChad](https://nvchad.com/), [AstroVim](https://astronvim.com/) and [LunarVim](https://www.lunarvim.org/).
+
+LazyVim is what I started with and is what I would recommend. It is mostly just a set of plugins with some mild configuration and logical keymaps. I think it is a good starting place for the eventual aim of creating your own config since it doesn't have a huge amount of custom code and is tied in very well with the excellent Lazy plugin manager. It's maintained by folke who has also created a lot of other great plugins.
+
+I also used NvChad for a while. It is more comprehensive and stylish than LazyVim but it adds it's own ways of doing things on top of systems that are already kind of complicated to understand. For example, it has its own way of specifying keymaps (complex wrapped around a very simple NeoVim API call) and LSP servers (a wrapper around `lsp-config` which is itself a complex wrapper around Neovim's builtin LSP support). The purpose of these wrappers is to make things easier for you but if you want to do more complex config or learn from NvChad to write you own config then they just get in the way.
+
+I haven't used AstroVim or LunarVim. It seems like LunarVim's aim is to be more of an IDE by being very feature rich but will likely have an incomprehensible config. AstroVim has made efforts to decrease the level of abstraction in the config to give users more direct access to the actual configuration of plugins. AstroVim also has it's own community plugin repository (you can still install any Neovim plugin normally but these are pre-configured for AstroVim I guess?).
+
+## 98: History
+
+The story starts with QED (Quick EDitor) which was developed in 1966 for the Berkeley Timesharing System. This was a line based editor that was designed around teleprinters. The most jarring thing about this editor from the modern perspective is that you cannot actually see the file you are working on since you are printing onto paper. You can use commands to to make changes to whole lines at a time.
+
+Later, Ken Thompson wrote a version for the Compatible Time-Sharing System. This version introduced regular expressions to the editor.
+
+When Ken Thompson later worked on the Unix operating system at Bell Labs in 1969, one of the key parts he created was an editor. This editor was called `ed` and was a stripped down version of the QED editor he had worked on prior. `ed` is still part of the POSIX specification and so is already installed on any POSIX-compliant system (including Mac). You can try it out: type `i` then enter to go to insert mode, type as many lines of text as you like, type `.` enter on a newline to end the insert: now you can do e.g. `1,3l` to print out the first 3 lines.
+
+George Coulouris developed an improved version of `ed` at Queen Mary's College, London in 1975. George had access to video displays which meant that he could redraw the display in order to show the user the file they were editing. Ken Thompson visited Queen Mary's College, saw George's improved version of `ed` and dismissed it as he saw no need to see the file he was editing. This lead George to name his editor `em`: "editor for mortals".
+
+In 1975, George visited UC Berkeley and met a graduate student named Bill Joy. Starting from the source code of `em`, Bill created his own iteration on `ed` called `ex` (extended `ed`). This was largely compatible with `ed` but added a "visual mode" which allowed the user to see the file they are editing. `ex` was added to BSD Unix in 1978. In 1979, BSD Unix added a new executable: `vi` would simply open `ex` in visual mode.
+
+At this time, BSD Unix came bundled with `ed` (where you couldn't see the file) and `vi` (where you could). Emacs also existed at this point but was not yet FOSS and cost hundreds of dollars. `vi` became very popular.
+
+The only problem was the license. `vi` was under the AT&T license which limited your ability to modify it. This lead to many `vi` clones under more permissive licenses such as STEVIE, Elvis and `nvi`.
+
+In 1988, Bram Moolenaar had an Amiga 2000. He had used `vi` on Unix at his university and wanted it on his Amiga (but it wasn't available on the platform). Referencing his copy of the more permissively licensed STEVIE, he created his own clone of `vim`. While other clones like STEVIE were missing many commands from `vi`, Bram's editor was full `vi` compatible. He named his editor `vim` ("Vi Imitation") as it only included a few new features. Bram would continue to develop the editor and, when version 2.0 released in 1993, changed the meaning of the name to "Vi Improved".
+
+In 2014, Thiago de Arruda tried to add multi-threading to Vim but his changes were rejected. He created his own fork of Vim. More radical changes would be added to this fork that lead to it becoming a full refactor of Vim. This fork was of course, Neovim.
+
+In 2023, Bram Moolenaar passed away aged 62. The Vim project continues to be maintained by Christian Brabandt.
+
+Sources:
+https://pikuma.com/blog/origins-of-vim-text-editor
+https://twobithistory.org/2018/08/05/where-vim-came-from.html
+https://en.wikipedia.org/wiki/QED_(text_editor)
+
+## 99: Uganda
+
+Vim is actually charityware; it is free software but the author (Bram Moolenaar) encourages you to donate to charity. In particular he wanted people to donate to https://iccf-holland.org/ which raises money for children in Uganda whose parents have died from AIDS.
+
+I would recommend reading `:h charity` to find out more about why Bram dedicated Vim to this cause and donating if you can.
+
+## 100: Vim
+
+I searched "Why use Vim" using a popular internet search engine and also with a popular large language model. Here is a list of what I found (other than specific Vim features/commands):
+
+- Code quickly/efficiently
+- Pre-installed on many machines
+- Often cannot use other editors on machines over ssh
+- High performance
+- Works on older machines
+- Other, keybinds are available for other programs
+- Shouldn't be obsolete any time soon
+- Useable for any programming language
+- Adherence to Unix philosophy
+- Don't need to use mouse
+- Customisable
+- Extensible
+- Portable configuration
+- FOSS
+- Community
+- Integration with commandline tools
+- Good documentation
+- Cross platform
+
+I looked pretty hard but couldn't find anyone giving the main reason I use Vim. 
+
+I use Vim because I enjoy writing code more using it. In Vim, pretty dull text edits become some kind of parkour speedrun; each new piece of code I write is a quick puzzle and, as time goes on, I get better and better at solving them. I like personalising my config and learning more about features I didn't know about as well as how the program works. I didn't write 100 VimTips™ because I think Vim has improved my efficiency and made me more productive in the workplace:
+
+There's a tendency to compare editors, command line programs, scripting languages, operating systems and all other manner of tools we use based solely on the practical features they offer. Of course, a tool needs to be fit for its purpose but I argue that there is almost always room for individuality and personal preference. 
+
+
+
+
+
+
+## 101: Exiting Vim
+
+To exit Vim, press the `:` key, then the `q` key and finally press the enter key. In practice, this tip isn't very useful since I don't really see an instance where you would want to stop using Vim.
+
+Alternative methods exist: `:q!`, `:wq`, `:wq!`, `:qa`, `:qa!`, `:wqa`, `:wqa!`, `:x`, `:xa`, `ZZ`, `ZQ`, `:cq`, `:cq!`, `:conf q`, `:conf q!`, `:conf wq`, `:conf wq!` :conf qa`, `:conf qa!`, `:conf wqa`, `:conf wqa!`, `:conf x`, `:conf xa`, `:conf cq`, `:conf cq!`. There are also the non-abbreviated forms of these commands:
+
+`:quit!`, `:quita`, `:quita!`, `:cquit`, `:cquit!`, `:conf quit`, `:conf quit!`, `:conf quita!`, `:conf cquit`, `:conf cquit!`
+
+In total, this gives you ?? different ways to exit Vim. The purpose of these other methods is to ensure that exiting Vim is sufficiently complex and confusing so that users don't accidentally leave Vim only to be met with the startling realisation that it is 2:39am and they have spent the entire evening reconfiguring their Neovim LSP setup.
+
+## α: Emacs
+
+Emacs is a text editor which is part of the GNU project and runs as both a graphical application and a terminal application.
+
+It is built around an interpreter for Emacs Lisp which 
+
+
+
+
+
+## Image processing
+
