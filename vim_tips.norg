@@ -1162,6 +1162,26 @@ I also used NvChad for a while. It is more comprehensive and stylish than LazyVi
 
 I haven't used AstroVim or LunarVim. It seems like LunarVim's aim is to be more of an IDE by being very feature rich but will likely have an incomprehensible config. AstroVim has made efforts to decrease the level of abstraction in the config to give users more direct access to the actual configuration of plugins. AstroVim also has it's own community plugin repository (you can still install any Neovim plugin normally but these are pre-configured for AstroVim I guess?).
 
+## 95: Barbecue
+
+[barbecue.nvim](https://github.com/utilyre/barbecue.nvim) Adds a winbar like in VS-Code which gives you context.
+
+For example: `some > directories > a_file.txt > function_name`
+
+
+## 96: Treesitter
+
+Treesitter is built in to Neovim. It users parser files (which are per language) to parse your code into a tree. This can be used to give improved highlighting, incremental selection, syntax based folding and more (although, these features are not part of Neovim, Neovim just creates the tree).
+
+While Treesitter is part of Neovim, you will almost certainly want to install [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter). This plugin allows you to easily install parsers as well as providing optional module for the aforementioned features.
+
+## 97: Verbose
+
+The `verbose` option can be used to provide useful information when debugging your Vim config. You can also do `:verbose {cmd}` to increase verbosity of a single command.
+
+One of the most useful ways to use this is with `set`. Running `:verbose set {option}?` will not only tell you the value of an option but also where it was last set
+
+
 ## 98: History
 
 The story starts with QED (Quick EDitor) which was developed in 1966 for the Berkeley Timesharing System. This was a line based editor that was designed around teleprinters. The most jarring thing about this editor from the modern perspective is that you cannot actually see the file you are working on since you are printing onto paper. You can use commands to to make changes to whole lines at a time.
@@ -1201,10 +1221,10 @@ I searched "Why use Vim" using a popular internet search engine and also with a 
 
 - Code quickly/efficiently
 - Pre-installed on many machines
-- Often cannot use other editors on machines over ssh
+- Useable over ssh
 - High performance
 - Works on older machines
-- Other, keybinds are available for other programs
+- Vim keybinds are available for other programs
 - Shouldn't be obsolete any time soon
 - Useable for any programming language
 - Adherence to Unix philosophy
@@ -1220,34 +1240,28 @@ I searched "Why use Vim" using a popular internet search engine and also with a 
 
 I looked pretty hard but couldn't find anyone giving the main reason I use Vim. 
 
-I use Vim because I enjoy writing code more using it. In Vim, pretty dull text edits become some kind of parkour speedrun; each new piece of code I write is a quick puzzle and, as time goes on, I get better and better at solving them. I like personalising my config and learning more about features I didn't know about as well as how the program works. I didn't write 100 VimTips™ because I think Vim has improved my efficiency and made me more productive in the workplace:
+I use Vim because I find writing code more fun in it. In Vim, pretty dull text edits become some kind of parkour; it's a quick puzzle and, as time goes on, I get better and better at solving them. I like personalising my config and learning more about features I didn't know about as well as how the program works. I didn't write 100 VimTips™ because I think Vim has improved my efficiency and made me more productive in the workplace: I did it because I thought it was fun.
 
-There's a tendency to compare editors, command line programs, scripting languages, operating systems and all other manner of tools we use based solely on the practical features they offer. Of course, a tool needs to be fit for its purpose but I argue that there is almost always room for individuality and personal preference. 
+There's a tendency to compare editors, command line programs, scripting languages, operating systems and all other manner of tools we use based only on the practical features they offer. Of course, a tool needs to be fit for its purpose but there is almost always room for individuality, personal preference and even just fun. The fact that people spend so much time talking about, configuring and building plugins for these tools shows that they actually enjoy them as much as they may claim that they only like the efficiency or practicality.
 
+So, whether you use Vim, VSCode, Emacs or any other editor. I suggest spending a bit of time thinking about whether there is anything you can do to make sitting in front of a computer for 8 hours more fun. You might not want to spend countless hours configuring plugins but maybe you could change the colour scheme or add a frog emoji to your shell prompt.
 
+This isn't just limited to editors. Think about other tools and software as well as hardware like keyboards, mice, desks, monitors and chairs. Last year I switched to a very weird keyboard (Ferris Sweep if you want to have a look) and found that this also made coding more enjoyable since there was another thing to personalise and learn.
 
+Remember to think about your health too: make sure you are sitting with healthy posture, arrange your desk and monitors at good heights and take breaks from typing to stretch your wrists and fingers. Developing issues later in life with your back or wrists is certainly not going to help you enjoy your work.
 
-
+I hope that you have all enjoyed these VimTips and thanks for listening. Even if they weren't all practical or useful, I hope that you found interesting interesting to read. If you have learnt anything at all then I consider that a bonus.
 
 ## 101: Exiting Vim
 
 To exit Vim, press the `:` key, then the `q` key and finally press the enter key. In practice, this tip isn't very useful since I don't really see an instance where you would want to stop using Vim.
 
-Alternative methods exist: `:q!`, `:wq`, `:wq!`, `:qa`, `:qa!`, `:wqa`, `:wqa!`, `:x`, `:xa`, `ZZ`, `ZQ`, `:cq`, `:cq!`, `:conf q`, `:conf q!`, `:conf wq`, `:conf wq!` :conf qa`, `:conf qa!`, `:conf wqa`, `:conf wqa!`, `:conf x`, `:conf xa`, `:conf cq`, `:conf cq!`. There are also the non-abbreviated forms of these commands:
-
-`:quit!`, `:quita`, `:quita!`, `:cquit`, `:cquit!`, `:conf quit`, `:conf quit!`, `:conf quita!`, `:conf cquit`, `:conf cquit!`
-
-In total, this gives you ?? different ways to exit Vim. The purpose of these other methods is to ensure that exiting Vim is sufficiently complex and confusing so that users don't accidentally leave Vim only to be met with the startling realisation that it is 2:39am and they have spent the entire evening reconfiguring their Neovim LSP setup.
-
 ## α: Emacs
 
 Emacs is a text editor which is part of the GNU project and runs as both a graphical application and a terminal application.
 
-It is built around an interpreter for Emacs Lisp which 
+It is built around an interpreter for Emacs Lisp which makes it highly configurable and extensible.
 
+Unlike Vim, it is a modeless editor and uses the more typical modifier keys + typeable keys to perform commands.
 
-
-
-
-## Image processing
-
+It's logo is a shade of purple that I think is quite nice.
